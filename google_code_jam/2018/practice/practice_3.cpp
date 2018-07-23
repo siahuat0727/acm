@@ -13,7 +13,15 @@
 using namespace std;
 
 void solve(){
-
+    int dis, n_horse;
+    cin >> dis >> n_horse;
+    double max_time = 0;
+    for (int i = 0; i < n_horse; ++i){
+        int s, v;
+        cin >> s >> v;
+        max_time = max(max_time,  (double)(dis-s)/v);
+    }
+    printf("%.6f\n", dis / max_time);
 }
 	
 int main() {
