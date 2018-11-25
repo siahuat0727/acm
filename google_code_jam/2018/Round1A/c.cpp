@@ -15,14 +15,15 @@
 using namespace std;
 
 struct Adjust{
-    double Min, Max;
+    int Min;
+    double Max;
 };
 
 vector<Adjust> v;
 vector<Adjust> v_all;
 
 bool cmp(Adjust a, Adjust b){
-    return a.Min < b.Min;
+    return a.Min == b.Min ? a.Max < b.Max : a.Min < b.Min;
 }
 
 void vec_merge_front(auto it){
@@ -52,48 +53,43 @@ void vec_add_all(Adjust a){
 
 void solve(){
     v.clear();
+    Adjust s0 = {0,0};
+    v.PB(s0);
     int n;
-    double p;
-    scanf("%d%lf", &n, &p);
-    double total = 0;
+    int p;
+    scanf("%d%d", &n, &p);
+    int total = 0;
     while(n--){
         int w, h;
         scanf("%d %d", &w, &h);
-        Adjust a = {(double)2*( min(w, h)), (double)2*( sqrt(w*w + h*h))};
+        Adjust a = {2*( min(w, h)), 2*( sqrt(w*w + h*h))};
         total += 2*(w + h);
 
         v_all.clear();
         for (Adjust b : v){
             Adjust tmp = {b.Min + a.Min, b.Max + a.Max};
-            v_all.PB(tmp);
+            if (tmp.Min <= p-total)
+                v_all.PB(tmp);
         }
         for (Adjust b : v_all){
             vec_insert(b);
         }
-        vec_insert(a);
     }
-    if(total > p){
-        printf("%.6f\n", (double)total);
-        return;
+    Adjust prev = {0, 0};
+    for (Adjust b : v) {
+        if (b.Min > p-total) {
+            break;
+        }
+        prev = b;
     }
-    Adjust to_find = {p-total, p};
-    auto it = lower_bound(v.begin(), v.end(), to_find, cmp);
-    //printf("f %f %f", it->Min, it->Max);
-    //for (Adjust a : v)
-    //    printf("%f %f", a.Min, a.Max);
-    //puts("");
-    if (it == v.end()){
-        printf("%.6f\n", total + (it-1)->Max > p ? p : total + (it-1)->Max);
-    }else if(it == v.begin()){
-        printf("%.6f\n", p-total < total+it->Min - p ? total : total+it->Min);
-    }else if((it-1)->Max + total > p){
-       printf("%.6f\n", p); 
-    }else{
-        printf("%.6f\n", p-(total+(it-1)->Max) < total + it->Min - p ? total+(it-1)->Max : total+it->Min);
+    if (prev.Max + total < p) {
+        printf("%.6f\n", total+prev.Max);
+    } else {
+        printf("%.6f\n", (double)p);
     }
 
 }
-	
+
 void test(){
     Adjust a = {1, 3};
     Adjust b = {2, 9};
@@ -102,7 +98,7 @@ void test(){
     v.PB(c);
     vec_insert(b);
     for (Adjust a : v){
-        printf("%f %f\n", a.Min, a.Max);
+        printf("%d %f\n", a.Min, a.Max);
     }
 }
 

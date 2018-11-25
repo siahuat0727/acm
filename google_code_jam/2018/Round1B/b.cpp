@@ -1,92 +1,78 @@
 #include <cstdio>
-#include <cstdlib>
-#include <string>
 #include <cstring>
 #include <algorithm>
-#include <cmath>
-#include <vector>
-#include <stack>
-#include <queue>
-#include <map>
-#include <iostream>
 
 #define PB push_back
 
 using namespace std;
 
-#define MAXN 10001
+#define MAXN 100001
 
-struct S{
-    int m, n;
+struct Candidate {
+    int M, N, start, xstart;
 };
 
-S s[MAXN];
+int M[MAXN];
+int N[MAXN];
+Candidate M_candidate[MAXN];
+Candidate N_candidate[MAXN];
 
-#define ANY 200003
-#define NOT 200004
-
-
-int count(int n){
-    bool lft_b = true;
-    bool rgt_b = true;
-
-    int lft = s[n].m, rgt = s[n].n;
-
-    S s1 = {.m=lft, .n=ANY};
-    S s2 = {.m=ANY, .n=lft};
-   
-
-    int i;
-    for(i = n-1; i >= 0; --i){
-        if(s1.m == NOT && s2.m == NOT)
-            break;
-        int l = s[i].m, r = s[i].n;
-
-        if (l == s1.m){
-            if (s1.n == ANY)
-                s1.n = r;
-            if (s1.n != r)
-                s1.m = NOT;
-        }else
-            s1.m = NOT;
-
-        if (r == s2.n){
-            if (s2.m == ANY)
-                s2.m = l;
-            if (s2.m != l)
-                s2.m = NOT;
-        }else
-            s2.m = NOT;
-            
-    }
-    return n-i;
-}
+const Candidate EmptyStruct = {0};
 
 void solve(){
     int n;
-    cin >> n;
+    scanf("%d", &n);
     int d, a, b;
     for(int i = 0; i < n; ++i){
         scanf("%d%d%d", &d, &a, &b);
-        s[i].m = d + a;
-        s[i].n = d - b;
-        //printf("%d %d\n", s[i].m, s[i].n);
+        M[i] = d + a;
+        N[i] = d - b;
     }
-    int max_pos = 1, num_valid = 1;
-    int diff_x = 0;
-    
-    for(int i = 1; i < n; ++i){
-        int pos = count(i);
-        if (pos > max_pos){
-            max_pos = pos;
-            num_valid = 1;
-        }else if(pos == max_pos)
-            num_valid += 1;
-    }
-    printf("%d %d\n", max_pos, num_valid);
 
+    M_candidate[0] = EmptyStruct;
+    N_candidate[0] = EmptyStruct;
+    M_candidate[0].M = M[0];
+    N_candidate[0].N = N[0];
+
+    int largest_set = 0;
+    int num_set = 0;
+    if (n == 1)
+        largest_set = num_set = 1;
+    for (int i = 1; i < n; ++i) {
+        // for M-candidate
+        if (M[i] == M[i-1]) {
+            M_candidate[i] = M_candidate[i-1];
+        } else if (M[i] == N_candidate[i-1].M) {
+            M_candidate[i] = N_candidate[i-1];
+            M_candidate[i].xstart = i;
+        } else {
+            M_candidate[i] = N_candidate[i-1];
+            M_candidate[i].M = M[i];
+            M_candidate[i].start = M_candidate[i].xstart;
+            M_candidate[i].xstart = i;
+        }
+        // for N-candidate
+        if (N[i] == N[i-1]) {
+            N_candidate[i] = N_candidate[i-1];
+        } else if (N[i] == M_candidate[i-1].N) {
+            N_candidate[i] = M_candidate[i-1];
+            N_candidate[i].xstart = i;
+        } else {
+            N_candidate[i] = M_candidate[i-1];
+            N_candidate[i].N = N[i];
+            N_candidate[i].start = N_candidate[i].xstart;
+            N_candidate[i].xstart = i;
+        }
+        int Max = max(i - N_candidate[i].start+1, i - M_candidate[i].start+1);
+        if (largest_set < Max) {
+            largest_set = Max;
+            num_set = 0;
+        }
+        num_set += largest_set == Max;
+    }
+    printf("%d %d\n", largest_set, num_set);
 }
-	
+
 int main() {
     int T;
     scanf("%d", &T);
