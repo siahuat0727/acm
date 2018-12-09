@@ -95,7 +95,7 @@ public:
         int word_len = A[0].length();
         int ans = 0;
         for (int w = 0; w < word_len; ++w) {
-            vector<bool>temp_cut = cut;
+            vector<bool> temp_cut = cut;
             int a;
             for (a = 0; a < vec_size-1; ++a) {
                 if (temp_cut[a])
@@ -104,9 +104,8 @@ public:
                     ans++;
                     break;
                 }
-                if (A[a][w] < A[a+1][w]) {
+                if (A[a][w] < A[a+1][w])
                     temp_cut[a] = true;
-                }
             }
             if (a == vec_size-1)
                 cut = temp_cut;
