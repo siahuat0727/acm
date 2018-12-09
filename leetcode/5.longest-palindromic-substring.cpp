@@ -32,23 +32,40 @@
  */
 class Solution {
 public:
+    int palindrome(int l, int r, int len, char* str) {
+        int length = 0;
+        while (l >= 0 && r < len) {
+            if (str[l] != str[r])
+                break;
+            length += 2;
+            --l;
+            ++r;
+        }
+        return length;
+    }
+
     string longestPalindrome(string s) {
         int len = s.length();
         char str[len + 1];
         strcpy(str, s.c_str());
+        string ret;
         int max_len = 0;
         for (int i = 0; i < len; ++i) {
-            int len = 1;
             int l = i - 1, r = i + 1;
-            while (l >= 0 && r < len) {
-                if (str[l] != str[r])
-                    break;
-
-
+            int length = palindrome(l, r, len, str) + 1;
+            if (max_len < length) {
+                max_len = length;
+                ret = s.substr(i-length/2, length);
             }
 
-
+            l = i;
+            r = i+1;
+            length = palindrome(l, r, len, str);
+            if (max_len < length) {
+                max_len = length;
+                ret = s.substr(i-length/2+1, length);
+            }
         }
-
+        return ret;
     }
 };
