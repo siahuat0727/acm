@@ -51,13 +51,11 @@ public:
         int m = obstacleGrid.size();
         int n = obstacleGrid[0].size();
         vector<unsigned long long> dp(m+1);
-        dp[0] = 0;
-        dp[1] = !obstacleGrid[0][0];
-        for (int i = 2; i <= m; ++i)
-            dp[i] = obstacleGrid[i-1][0] ? 0 : dp[i] + dp[i-1];
-        for (int j = 1; j < n; ++j)
+        for (int j = 0; j < n; ++j) {
+            dp[0] = !j;  // To make dp[1] = !obstacleGrid[0][0] at first time
             for (int i = 1; i <= m; ++i)
                 dp[i] = obstacleGrid[i-1][j] ? 0 : dp[i] + dp[i-1];
+        }
         return dp[m];
     }
 };
